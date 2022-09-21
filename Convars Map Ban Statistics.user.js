@@ -4,6 +4,7 @@
 // @version      0.7
 // @description  Counts number of bans per map.
 // @author       Apina-32
+// @updateURL    https://github.com/Apina-32/userscripts/raw/main/Convars%20Map%20Ban%20Statistics.user.js
 // @match        https://convars.com/csgostats/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_registerMenuCommand

@@ -4,6 +4,7 @@
 // @version      0.1
 // @description  Copy all Steam IDs from match history
 // @author       Apina-32
+// @updateURL    https://github.com/Apina-32/userscripts/raw/main/Convars%20SteamID.user.js
 // @match        https://convars.com/csgostats/en/*
 // @icon         https://icons.duckduckgo.com/ip2/convars.com.ico
 // @grant        GM_registerMenuCommand

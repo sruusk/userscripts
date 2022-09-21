@@ -4,6 +4,7 @@
 // @version      0.1
 // @description  Retrieves all games for a referee during the current year
 // @author       Apina-32
+// @updateURL    https://github.com/Apina-32/userscripts/raw/main/Pesis%20tilastot.user.js
 // @match        https://www.pesistulokset.fi/*
 // @icon         https://icons.duckduckgo.com/ip2/superpesis.fi.ico
 // @grant        GM_xmlhttpRequest
@@ -14,7 +15,7 @@
 (async function() {
     'use strict';
     const REFEREE = "REFEREE NAME";
-    const DELAY = 500;
+    const DELAY = 1000;
 
     const date = new Date();
     const year = date.getFullYear();
