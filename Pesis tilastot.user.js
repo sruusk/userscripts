@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pesis tilastot
 // @namespace    https://github.com/Apina-32/
-// @version      0.1
+// @version      0.2
 // @description  Retrieves all games for a referee during the current year
 // @author       Apina-32
 // @updateURL    https://github.com/Apina-32/userscripts/raw/main/Pesis%20tilastot.user.js
@@ -62,13 +62,17 @@
             headers: {
                 "Accept": "json" // If not specified, browser defaults will be used.
             },
-            onload: function(response) {
+            onload: async function(response) {
                 try{
                     const content = JSON.parse(response.response);
                     content.data.forEach(match => {
                         getMatch(`${match.url}#info`);
                     });
-                }catch(e){window.alert("Error occured!\nTry raising the delay."); window.reload();}
+                }
+                catch(e){
+                    //window.alert("Error occured!\nTry raising the delay.");
+                    await getMatches(url);
+                }
             }
         });
     };
