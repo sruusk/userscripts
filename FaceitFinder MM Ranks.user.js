@@ -28,8 +28,7 @@
     const infoCount = 6;
     const timeInMatchPosition = infoCount + 1;
     const competitiveWinsPosition = timeInMatchPosition + 1;
-    const inventoryValuePosition = competitiveWinsPosition + 1;
-    const dateOfLastGamePosition = inventoryValuePosition + 1;
+    const dateOfLastGamePosition = competitiveWinsPosition + 1;
 
 
     const prevPlayers = JSON.parse(await GM_getValue("previousPlayers", "{}"));
@@ -64,10 +63,6 @@
                 default: 1000
             },
             short_mode: {
-                type: 'checkbox',
-                default: false
-            },
-            inventory_value: {
                 type: 'checkbox',
                 default: false
             }
@@ -141,10 +136,12 @@
 
     // Ads a new data row at position (int, >7)
     function addInfoField(account, title, value, position, isBad, toolTip, image) {
-        if (cfg.get('short_mode') || account.querySelector("#A" + position) != null) return;
         let steamInfoContainer;
         if (account.querySelector(".account-steaminfo-container") != null) steamInfoContainer = ".account-steaminfo-container";
         else steamInfoContainer = ".account-steaminfo-container-banned";
+
+        if(cfg.get('short_mode')) account.querySelector(steamInfoContainer).style.height = (25 * infoCount) + 'px';
+        if (cfg.get('short_mode') || account.querySelector("#A" + position) != null) return;
 
         // Set container height based on the number of entries
         let count = account.querySelector(steamInfoContainer).getAttribute("dataCount");
@@ -209,7 +206,7 @@
     }
 
     function setDateOfLastGame(account) {
-        const APIkey = 'd3a051e6-b8ff-4744-b143-f5cc9c65397b';
+        const APIkey = '84bcbcd9-2073-44d3-861a-08661ea2ed76';
         const game = 'csgo';
         // In unix time | This defines from which point in time onwwards faceit should find matches.
         // It just needs to be far ago enough that we can fetch the latest game even if it was played a long time ago.
@@ -470,49 +467,6 @@
         }
     }
 
-    function setInventoryValue(id, account) {
-        GM_xmlhttpRequest({
-            method: "GET",
-            url: "http://csgobackpack.net/api/GetInventoryValue/?id=" + id + "&currency=EUR",
-            headers: {
-                "Accept": "xml" // If not specified, browser defaults will be used.
-            },
-            onload: function (response) {
-                try {
-                    let res = JSON.parse(response.response);
-                    console.log(res);
-                    if (res.success == "false") {
-                        removeInfoField(account, inventoryValuePosition);
-                        addInfoField(account, "Inventory value:", "Private", inventoryValuePosition, true, null, null);
-                        return;
-                    } else if (res.success != "true") throw "Inventory value request was not successfull.\n" + res.success;
-                    let value = res.value;
-                    removeInfoField(account, inventoryValuePosition);
-                    addInfoField(account, "Inventory value:", value + "€", inventoryValuePosition, false, null, null);
-                } catch (e) {
-                    console.error(e);
-                    removeInfoField(account, inventoryValuePosition);
-                    addInfoField(account, "Inventory value:", " Unavailable ", inventoryValuePosition, true, "Inventory unavailable.\n" + e, null);
-                    account.querySelector("#A" + inventoryValuePosition).onclick = function () {
-                        removeInfoField(account, inventoryValuePosition);
-                        addInfoField(account, "Inventory value:", " Loading ", inventoryValuePosition, false, null, null);
-                        setInventoryValue(id, account);
-                    };
-                }
-            }
-        });
-    }
-
-    function addInventoryValue(id, account) {
-        addInfoField(account, "Inventory value:", " - ", inventoryValuePosition, false, "Click to load inventory value.\n5 Requests an hour!", HISTORYIMAGE);
-        account.querySelector("#A" + inventoryValuePosition).style.cursor = "pointer";
-        account.querySelector("#A" + inventoryValuePosition).onclick = function () {
-            removeInfoField(account, inventoryValuePosition);
-            addInfoField(account, "Inventory value:", " Loading ", inventoryValuePosition, false, null, null);
-            setInventoryValue(id, account);
-        };
-    }
-
     function cheaterChance(account, iterator) {
         if (iterator == undefined) iterator = 0;
         const date = new Date();
@@ -724,22 +678,6 @@
             let vlad = account.querySelector(`#A${infoCount}`).children[0].children[0];
             if (vlad.children.length > 1) vlad.children[1].style.cursor = "";
 
-            adjustCSSRules('.steam-trust-progress-orange', 'display: inline-block');
-            adjustCSSRules('.steam-trust-progress-orange', 'height: 8px');
-            adjustCSSRules('.steam-trust-progress-orange', 'overflow: hidden');
-            adjustCSSRules('.user-profile-rank-lock', 'position: absolute')
-            adjustCSSRules('.user-profile-rank-lock', 'top: 50%')
-            adjustCSSRules('.user-profile-rank-lock', 'left: 50%')
-            adjustCSSRules('.user-profile-rank-lock', 'transform: translate(-50%,-60%)')
-            adjustCSSRules('.user-profile-rank-lock', 'opacity: .85')
-            adjustCSSRules('.user-profile-rank-lock', 'width: 15px')
-            adjustCSSRules('.account-faceit-level', 'display: flex')
-            adjustCSSRules('.account-faceit-level', 'flex-direction: row')
-            adjustCSSRules('.account-faceit-level', 'flex-wrap: nowrap')
-            adjustCSSRules('.account-faceit-level', 'align-content: center')
-            adjustCSSRules('.account-faceit-level', 'justify-content: center')
-            adjustCSSRules('.account-faceit-notfound', 'line-height: ')
-
             await addPlayerHistory(account);
             // Add coherent styling when account has no faceit
             await configFaceitNotFound(account);
@@ -747,13 +685,28 @@
             setDateOfLastGame(account, 0);
             // Get rank and other data from csgostats and convars
             httpGet(account, "https://csgostats.gg/player/" + accountID, accountID);
-            // get inventory value
-            if (cfg.get('inventory_value') && !cfg.get('short_mode')) addInventoryValue(accountID, account);
             cheaterChance(account);
             getEsportalRank(account, accountID);
             if (account.querySelector(".account-faceit-detailed-stats") != null) account.querySelector(".account-faceit-detailed-stats").children[0].target = '_black';
         });
         GM_setValue("previousPlayers", JSON.stringify(prevPlayers));
+
+        adjustCSSRules('.account-row', 'height: unset');
+        adjustCSSRules('.steam-trust-progress-orange', 'display: inline-block');
+        adjustCSSRules('.steam-trust-progress-orange', 'height: 8px');
+        adjustCSSRules('.steam-trust-progress-orange', 'overflow: hidden');
+        adjustCSSRules('.user-profile-rank-lock', 'position: absolute')
+        adjustCSSRules('.user-profile-rank-lock', 'top: 50%')
+        adjustCSSRules('.user-profile-rank-lock', 'left: 50%')
+        adjustCSSRules('.user-profile-rank-lock', 'transform: translate(-50%,-60%)')
+        adjustCSSRules('.user-profile-rank-lock', 'opacity: .85')
+        adjustCSSRules('.user-profile-rank-lock', 'width: 15px')
+        adjustCSSRules('.account-faceit-level', 'display: flex')
+        adjustCSSRules('.account-faceit-level', 'flex-direction: row')
+        adjustCSSRules('.account-faceit-level', 'flex-wrap: nowrap')
+        adjustCSSRules('.account-faceit-level', 'align-content: center')
+        adjustCSSRules('.account-faceit-level', 'justify-content: center')
+        adjustCSSRules('.account-faceit-notfound', 'line-height: ')
 
         // Adds functionality for moving accounts to different team
         // First create and add a second account-container
@@ -890,12 +843,6 @@
                 }
             }
             secondContainer.querySelector("#" + smurfsElementId).children[0].onclick = imageParent.onclick;
-        }
-
-        // Make it possible to get inventory value from second container
-        if (secondContainer.querySelector("#player_" + player).querySelector(`#A${inventoryValuePosition}`) != undefined) {
-            secondContainer.querySelector("#player_" + player).querySelector(`#A${inventoryValuePosition}`)
-                .onclick = document.querySelector("#player_" + player).querySelector(`#A${inventoryValuePosition}`).onclick;
         }
 
     }
