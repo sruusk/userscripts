@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         FaceitFinder MM Ranks
-// @version      2.8.0
+// @version      2.8.1
 // @description  Fetches and displays cs:go competitive ranks in faceitfinder.
 // @author       Apina-32
 // @updateURL    https://github.com/Apina-32/userscripts/raw/main/FaceitFinder%20MM%20Ranks.user.js
