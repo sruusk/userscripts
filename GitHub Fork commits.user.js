@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         GitHub Fork commits
-// @namespace    https://github.com/Apina-32/
+// @namespace    https://a32.fi
 // @version      0.2
 // @description  checks if fork is ahead
 // @author       Apina-32
 // @updateURL    https://github.com/Apina-32/userscripts/raw/main/GitHub%20Fork%20commits.user.js
+// @downloadURL  https://github.com/Apina-32/userscripts/raw/main/GitHub%20Fork%20commits.user.js
 // @match        https://github.com/*
 // @icon         https://icons.duckduckgo.com/ip2/github.com.ico
 // @grant        GM_registerMenuCommand
