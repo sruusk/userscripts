@@ -4,6 +4,7 @@
 // @description  Fetches and displays cs:go competitive ranks in faceitfinder.
 // @author       Apina-32
 // @updateURL    https://github.com/Apina-32/userscripts/raw/main/FaceitFinder%20MM%20Ranks.user.js
+// @downloadURL  https://github.com/Apina-32/userscripts/raw/main/FaceitFinder%20MM%20Ranks.user.js
 // @match        https://faceitfinder.com/*
 // @icon         https://faceitfinder.com/themes/dark/images/anonymous_logo.png
 // @grant        GM_xmlhttpRequest
@@ -17,7 +18,7 @@
 // @connect      faceit.com
 // @connect      esportal.com
 // @require      https://greasyfork.org/scripts/395037-monkeyconfig-modern/code/MonkeyConfig%20Modern.js?version=764968
-// @namespace    https://github.com/Apina-32/
+// @namespace    https://a32.fi
 // ==/UserScript==
 
 (async function () {
