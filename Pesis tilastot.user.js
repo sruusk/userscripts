@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Pesis tilastot
-// @namespace    https://github.com/Apina-32/
+// @namespace    https://a32.fi
 // @version      0.2
 // @description  Retrieves all games for a referee during the current year
 // @author       Apina-32
 // @updateURL    https://github.com/Apina-32/userscripts/raw/main/Pesis%20tilastot.user.js
+// @downloadURL  https://github.com/Apina-32/userscripts/raw/main/Pesis%20tilastot.user.js
 // @match        https://www.pesistulokset.fi/*
 // @icon         https://icons.duckduckgo.com/ip2/superpesis.fi.ico
 // @grant        GM_xmlhttpRequest
