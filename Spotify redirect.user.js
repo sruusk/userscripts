@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         Spotify redirect
-// @version      1.1
-// @namespace    https://github.com/Apina-32/
+// @version      1.2
+// @namespace    https://a32.fi
 // @updateURL    https://github.com/Apina-32/userscripts/raw/main/Spotify%20redirect.user.js
+// @downlaodURL  https://github.com/Apina-32/userscripts/raw/main/Spotify%20redirect.user.js
 // @match        http://open.spotify.com/*
 // @match        https://open.spotify.com/*
 // @grant        window.close
