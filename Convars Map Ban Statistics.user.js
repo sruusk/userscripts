@@ -1,11 +1,9 @@
 // ==UserScript==
 // @name         Convars Map Ban Statistics
-// @namespace    https://a32.fi/
-// @version      0.7
+// @namespace    http://a32.fi/
+// @version      0.8
 // @description  Counts number of bans per map.
 // @author       Apina-32
-// @updateURL    https://github.com/Apina-32/userscripts/raw/main/Convars%20Map%20Ban%20Statistics.user.js
-// @downloadURL  https://github.com/Apina-32/userscripts/raw/main/Convars%20Map%20Ban%20Statistics.user.js
 // @match        https://convars.com/csgostats/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_registerMenuCommand
@@ -55,8 +53,8 @@
                 nicks.push(nick);
             }
         };
-        let text = `\nChance of someone getting banned | ${document.querySelector('.prof1').textContent}`;
         const games = getGames();
+        let text = `Chance of someone getting banned in ${Object.values(games).reduce((acc, val) => acc + val)} matches | ${document.querySelector('.prof1').textContent}`;
         const values = {};
         Object.keys(maps).forEach(key => {
             values[key] = Math.round((maps[key] / games[key]) * 100);
@@ -71,7 +69,7 @@
         });
         console.log(text);
         GM_setClipboard(text, 'text');
-        window.alert("Ban stats copied to clipboard.");
+        window.alert("Ban stats copied to clipboard.\n\n" + text);
     }
 
     function formatToLen(length, text){
