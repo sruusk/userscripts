@@ -2,15 +2,15 @@
 // @name         Spotify redirect
 // @version      1.2
 // @namespace    https://a32.fi
-// @updateURL    https://github.com/Apina-32/userscripts/raw/main/Spotify%20redirect.user.js
-// @downloadURL  https://github.com/Apina-32/userscripts/raw/main/Spotify%20redirect.user.js
+// @updateURL    https://github.com/sruusk/userscripts/raw/main/Spotify%20redirect.user.js
+// @downloadURL  https://github.com/sruusk/userscripts/raw/main/Spotify%20redirect.user.js
 // @match        http://open.spotify.com/*
 // @match        https://open.spotify.com/*
 // @grant        window.close
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @description  Open open.spotify.com links in desktop app
-// @author       Apina-32
+// @author       sruusk
 // ==/UserScript==
 
 (function() {

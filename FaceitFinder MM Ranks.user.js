@@ -2,9 +2,9 @@
 // @name         FaceitFinder MM Ranks
 // @version      2.8.2
 // @description  Fetches and displays cs:go competitive ranks in faceitfinder.
-// @author       Apina-32
-// @updateURL    https://github.com/Apina-32/userscripts/raw/main/FaceitFinder%20MM%20Ranks.user.js
-// @downloadURL  https://github.com/Apina-32/userscripts/raw/main/FaceitFinder%20MM%20Ranks.user.js
+// @author       sruusk
+// @updateURL    https://github.com/sruusk/userscripts/raw/main/FaceitFinder%20MM%20Ranks.user.js
+// @downloadURL  https://github.com/sruusk/userscripts/raw/main/FaceitFinder%20MM%20Ranks.user.js
 // @match        https://faceitfinder.com/*
 // @icon         https://faceitfinder.com/themes/dark/images/anonymous_logo.png
 // @grant        GM_xmlhttpRequest

@@ -3,7 +3,7 @@
 // @namespace    http://a32.fi/
 // @version      0.8
 // @description  Counts number of bans per map.
-// @author       Apina-32
+// @author       sruusk
 // @match        https://convars.com/csgostats/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_registerMenuCommand
