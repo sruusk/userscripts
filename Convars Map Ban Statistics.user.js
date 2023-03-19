@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Convars Map Ban Statistics
+// @name         Convars Map Statistics
 // @namespace    http://a32.fi/
-// @version      0.8
+// @version      0.9
 // @description  Counts number of bans per map.
 // @author       sruusk
 // @match        https://convars.com/csgostats/*
@@ -13,10 +13,8 @@
 (function() {
     'use strict';
 
-    var timer;
-    console.clear();
-
-    GM_registerMenuCommand("Get ban stats", run);
+    GM_registerMenuCommand("Get ban stats", getBanStats);
+    GM_registerMenuCommand("Get map winrates", getWinrates);
 
     function getGames() {
         let maps = [];
@@ -37,9 +35,9 @@
     }
 
 
-    function run(){
+    function getBanStats(){
+        console.clear();
         document.querySelector("#but_tabPers6").click();
-        clearInterval(timer);
         let elements = document.getElementsByClassName("cv_tablecell cell flextable_bans_cell");
         let maps = {}; // Save ban counts for maps
         let nicks = []; // Save nicks to avoid duplicates
@@ -72,6 +70,45 @@
         window.alert("Ban stats copied to clipboard.\n\n" + text);
     }
 
+    function getWinrates(){
+        console.clear();
+        let maps = {};
+        document.querySelector("#but_tabPers5").click();
+        const tabs = document.querySelectorAll(".tabmatch");
+        tabs.forEach(tab => {
+            document.querySelector("#selectMatches").value = tab.id.replace("tabmatch", "");
+            changeMatches('selectMatches'); // Convars internal function
+            const matches = tab.querySelectorAll(".cv_cardmap");
+            matches.forEach(match => {
+                const isWin = match.classList.contains("win") || match.classList.contains("tie"); // Include ties in wins
+                const map = match.querySelector(".cv_cardmap_map").textContent;
+                if(Object.keys(maps).includes(map)) maps[map].total++; // Increment total
+                else maps[map] = { "wins": 0, "total": 1 }; // Initialise new map object
+                if(isWin) maps[map].wins++; // Increment wins
+            });
+        });
+        console.log(maps);
+        console.log(JSON.stringify(maps));
+
+        // Build output
+        let text = `Map winrates (including ties) in ${Object.values(maps).reduce((acc, val) => acc + val.total, 0)} matches | ${document.querySelector('.prof1').textContent}`;
+        const values = {};
+        Object.keys(maps).forEach(key => {
+            values[key] = Math.round((maps[key].wins / maps[key].total) * 100);
+        });
+        const mapLen = longest(Object.keys(values));
+        const persLen = longest(Object.values(values)) + 1;
+        const countLen = longest(Object.values(maps).map(map => map.total));
+        Object.values(values).sort(function(a, b){return a-b}).forEach(val => {
+            Object.keys(values).forEach(key => {
+                if(values[key] == val && !text.includes(key)) text += `\n${formatToLen(mapLen, key)} - ${formatToLen(persLen, values[key] + '%')} of ${formatToLen(countLen, maps[key].total)} matches`;
+            });
+        });
+        console.log(text);
+        GM_setClipboard(text, 'text');
+        window.alert("Map stats copied to clipboard.\n\n" + text);
+    }
+
     function formatToLen(length, text){
         return text + ' '.repeat(length - text.toString().length);
     }
@@ -83,13 +120,6 @@
             if(str.length > len) len = str.length;
         });
         return len;
-    }
-
-    function activate(){ // Not used
-        flextable_sort(this,"flextable_bans",2); // Convars internal function
-        clearInterval(timer);
-        timer = setInterval(run, 2000);
-        run();
     }
 
 
