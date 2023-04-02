@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convars Map Statistics
 // @namespace    http://a32.fi/
-// @version      0.11
+// @version      0.12
 // @description  Counts number of bans per map.
 // @author       sruusk
 // @match        https://convars.com/csgostats/*
@@ -52,7 +52,7 @@ Sorted by win rate; Ignored maps with <${ignoreThreshold} matches\n`;
 
         Object.entries(maps).forEach(([map, stats]) => {
             data[map] = {
-                bpm: Math.round(stats.bans / stats.total * 100) / 100,
+                bpm: Math.round(stats.totalBans / stats.total * 100) / 100,
                 pers: Math.round((stats.bans / stats.total) * 100),
                 wr: Math.round((stats.wins / stats.total) * 100)
             };
