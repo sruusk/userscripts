@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convars Map Statistics
 // @namespace    http://a32.fi/
-// @version      0.10
+// @version      0.11
 // @description  Counts number of bans per map.
 // @author       sruusk
 // @match        https://convars.com/csgostats/*
@@ -13,87 +13,11 @@
 (function() {
     'use strict';
 
-    GM_registerMenuCommand("Get bans per match", getBanStats);
-    GM_registerMenuCommand("Get unfair matches", getAbsoluteBanStats);
-    GM_registerMenuCommand("Get map winrates", getWinrates);
+    GM_registerMenuCommand("Get map stats", combinedStats);
 
-    function getBanStats(){
-        console.clear();
-        document.querySelector("#but_tabPers6").click();
-        let elements = document.getElementsByClassName("cv_tablecell cell flextable_bans_cell");
-        let maps = {};
-        document.querySelector("#but_tabPers5").click();
-        const tabs = document.querySelectorAll(".tabmatch");
-        tabs.forEach(tab => {
-            document.querySelector("#selectMatches").value = tab.id.replace("tabmatch", "");
-            changeMatches('selectMatches'); // Convars internal function
-            const matches = tab.querySelectorAll(".cv_cardmap");
-            matches.forEach(match => {
-                const map = match.querySelector(".cv_cardmap_map").textContent;
-                if(!Object.keys(maps).includes(map)) maps[map] = { total: 0, bans: 0 };
-                maps[map].total++;
-                const bans = match.querySelectorAll(".cv_cardmap_players .banned");
-                maps[map].bans += bans.length
-            });
-        });
+    const ignoreThreshold = 10;
 
-        let text = `Banned players per match in ${Object.values(maps).reduce((acc, val) => acc + val.total, 0)} matches | ${document.querySelector('.prof1').textContent}`;
-        const values = {};
-        Object.keys(maps).forEach(key => {
-            values[key] = Math.round(maps[key].bans / maps[key].total * 100) / 100;
-        });
-        const mapLen = longest(Object.keys(values));
-        const persLen = longest(Object.values(values));
-        const countLen = longest(Object.values(maps).map(map => map.total));
-        Object.values(values).sort(function(a, b){return a-b}).forEach(val => {
-            Object.keys(values).forEach(key => {
-                if(values[key] == val && !text.includes(key)) text += `\n${formatToLen(mapLen, key)} - ${formatToLen(persLen, values[key])} bans per match in ${formatToLen(countLen, maps[key].total)} matches`;
-            });
-        });
-        console.log(text);
-        GM_setClipboard(text, 'text');
-        window.alert("Ban stats copied to clipboard.\n\n" + text);
-    }
-
-    function getAbsoluteBanStats(){
-        console.clear();
-        document.querySelector("#but_tabPers6").click();
-        let elements = document.getElementsByClassName("cv_tablecell cell flextable_bans_cell");
-        let maps = {};
-        document.querySelector("#but_tabPers5").click();
-        const tabs = document.querySelectorAll(".tabmatch");
-        tabs.forEach(tab => {
-            document.querySelector("#selectMatches").value = tab.id.replace("tabmatch", "");
-            changeMatches('selectMatches'); // Convars internal function
-            const matches = tab.querySelectorAll(".cv_cardmap");
-            matches.forEach(match => {
-                const map = match.querySelector(".cv_cardmap_map").textContent;
-                if(!Object.keys(maps).includes(map)) maps[map] = { total: 0, bans: 0 };
-                maps[map].total++;
-                const bans = match.querySelectorAll(".cv_cardmap_players .banned");
-                maps[map].bans += bans.length > 0;
-            });
-        });
-
-        let text = `Percentage of matches having banned players in ${Object.values(maps).reduce((acc, val) => acc + val.total, 0)} matches | ${document.querySelector('.prof1').textContent}`;
-        const values = {};
-        Object.keys(maps).forEach(key => {
-            values[key] = Math.round((maps[key].bans / maps[key].total) * 100);
-        });
-        const mapLen = longest(Object.keys(values));
-        const persLen = longest(Object.values(values)) + 1;
-        const countLen = longest(Object.values(maps).map(map => map.total));
-        Object.values(values).sort(function(a, b){return a-b}).forEach(val => {
-            Object.keys(values).forEach(key => {
-                if(values[key] == val && !text.includes(key)) text += `\n${formatToLen(mapLen, key)} - ${formatToLen(persLen, values[key] + '%')} out of ${formatToLen(countLen, maps[key].total)} matches`;
-            });
-        });
-        console.log(text);
-        GM_setClipboard(text, 'text');
-        window.alert("Ban stats copied to clipboard.\n\n" + text);
-    }
-
-    function getWinrates(){
+    function combinedStats(){
         console.clear();
         let maps = {};
         document.querySelector("#but_tabPers5").click();
@@ -105,28 +29,59 @@
             matches.forEach(match => {
                 const isWin = match.classList.contains("win") || match.classList.contains("tie"); // Include ties in wins
                 const map = match.querySelector(".cv_cardmap_map").textContent;
-                if(Object.keys(maps).includes(map)) maps[map].total++; // Increment total
-                else maps[map] = { "wins": 0, "total": 1 }; // Initialise new map object
-                if(isWin) maps[map].wins++; // Increment wins
-            });
-        });
-        console.log(maps);
-        console.log(JSON.stringify(maps));
+                const bans = match.querySelectorAll(".cv_cardmap_players .banned");
 
-        // Build output
-        let text = `Map winrates (including ties) in ${Object.values(maps).reduce((acc, val) => acc + val.total, 0)} matches | ${document.querySelector('.prof1').textContent}`;
-        const values = {};
-        Object.keys(maps).forEach(key => {
-            values[key] = Math.round((maps[key].wins / maps[key].total) * 100);
-        });
-        const mapLen = longest(Object.keys(values));
-        const persLen = longest(Object.values(values)) + 1;
-        const countLen = longest(Object.values(maps).map(map => map.total));
-        Object.values(values).sort(function(a, b){return a-b}).forEach(val => {
-            Object.keys(values).forEach(key => {
-                if(values[key] == val && !text.includes(key)) text += `\n${formatToLen(mapLen, key)} - ${formatToLen(persLen, values[key] + '%')} of ${formatToLen(countLen, maps[key].total)} matches`;
+                if(!Object.keys(maps).includes(map)) maps[map] = { total: 0, totalBans: 0, bans: 0, wins: 0 };
+                maps[map].total++;
+                if(isWin) maps[map].wins++;
+                maps[map].totalBans += bans.length
+                maps[map].bans += bans.length > 0;
             });
         });
+
+        let text =
+`Convars map stats from ${Object.values(maps).reduce((acc, val) => acc + val.total, 0)} matches | ${document.querySelector('.prof1').textContent}
+
+BPM = Bans per match
+% = Percentage of matches having banned players
+WR = Win rate
+
+Sorted by win rate; Ignored maps with <${ignoreThreshold} matches\n`;
+
+        const data = {};
+
+        Object.entries(maps).forEach(([map, stats]) => {
+            data[map] = {
+                bpm: Math.round(stats.bans / stats.total * 100) / 100,
+                pers: Math.round((stats.bans / stats.total) * 100),
+                wr: Math.round((stats.wins / stats.total) * 100)
+            };
+        });
+
+        const mapLen = longest(Object.keys(maps));
+        const bpmLen = longest(Object.values(data).map(item => item.bpm));
+        const persLen = longest(Object.values(data).map(item => item.pers)) + 1;
+        const wrLen = Math.max(longest(Object.values(data).map(item => item.wr)) + 1, 'WR ▼'.length);
+        const countLen = 5; //longest(Object.values(maps).map(item => item.total))
+
+        const totalLen = mapLen + bpmLen + persLen + wrLen + countLen;
+
+        text += `\n┌${'─'.repeat(mapLen + 2)}┬${'─'.repeat(bpmLen + 2)}┬${'─'.repeat(persLen + 2)}┬${'─'.repeat(wrLen + 2)}┬${'─'.repeat(countLen + 2)}┐`;
+        text += `\n│ ${formatToLen(mapLen, 'Map')} │ ${formatToLen(bpmLen, 'BPM')} │ ${formatToLen(persLen, '%')} │ ${formatToLen(wrLen, 'WR ▼')} │ Total │`
+
+        const sortBy = Object.values(data).map(item => item.wr);
+
+        sortBy.sort(function(a, b){return b-a}).forEach(val => {
+            Object.keys(maps).forEach((key) => {
+                if(data[key].wr == val && !text.includes(key) && maps[key].total >= ignoreThreshold) {
+                    text += `\n├${'─'.repeat(mapLen + 2)}┼${'─'.repeat(bpmLen + 2)}┼${'─'.repeat(persLen + 2)}┼${'─'.repeat(wrLen + 2)}┼${'─'.repeat(countLen + 2)}┤`;
+                    text += `\n│ ${formatToLen(mapLen, key)} │ ${formatToLen(bpmLen, data[key].bpm)} │ ${formatToLen(persLen, data[key].pers + '%')} │ ${formatToLen(wrLen, data[key].wr + '%')} │ ${formatToLen(countLen, maps[key].total)} │`;
+                }
+            });
+        });
+
+        text += `\n└${'─'.repeat(mapLen + 2)}┴${'─'.repeat(bpmLen + 2)}┴${'─'.repeat(persLen + 2)}┴${'─'.repeat(wrLen + 2)}┴${'─'.repeat(countLen + 2)}┘`;
+
         console.log(text);
         GM_setClipboard(text, 'text');
         window.alert("Map stats copied to clipboard.\n\n" + text);
