@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convars Map Statistics
 // @namespace    http://a32.fi/
-// @version      0.13
+// @version      0.14
 // @description  Counts number of bans per map.
 // @author       sruusk
 // @match        https://convars.com/csgostats/*
@@ -34,7 +34,7 @@
 
                 if(!Object.keys(maps).includes(map)) maps[map] = { total: 0, totalBans: 0, bans: 0, wins: 0, ties: 0 };
                 maps[map].total++;
-                if(isWin || isTie) maps[map].wins++;
+                if(isWin) maps[map].wins++;
                 if(isTie) maps[map].ties++;
                 maps[map].totalBans += bans.length
                 maps[map].bans += bans.length > 0;
@@ -46,7 +46,7 @@
 
 BPM = Bans per match
 Ban% = Percentage of matches having banned players
-WR = Win rate (including ties)
+WR = Win rate
 
 Sorted by win rate; Ignored maps with <${ignoreThreshold} matches\n`;
 
