@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pesis tilastot
 // @namespace    https://a32.fi
-// @version      0.2
+// @version      0.3
 // @description  Retrieves all games for a referee during the current year
 // @author       sruusk
 // @updateURL    https://github.com/sruusk/userscripts/raw/main/Pesis%20tilastot.user.js
@@ -16,7 +16,7 @@
 (async function() {
     'use strict';
     const REFEREE = "REFEREE NAME";
-    const DELAY = 1000;
+    const DELAY = 5000;
 
     const date = new Date();
     const year = date.getFullYear();
@@ -48,10 +48,10 @@
                         counter++;
                         games.push(url.replace("#info", ""));
                         console.log(counter, url.replace("#info", ""));
-                        document.querySelector("#referee-info").textContent = `Loading... Found ${counter} matches.`;
                         addLink(url.replace("#info", ""));
                     }
                 });
+                document.querySelector("#referee-info").textContent = `Loading...\n${ daysSinceStartOfYear(date) * DELAY / 1000 } seconds remaining.\nFound ${counter} matches.`;
             }
         });
     };
@@ -82,6 +82,12 @@
         return date.toISOString().split("T")[0]
     };
 
+    function daysSinceStartOfYear(date) {
+        const startOfYear = new Date(date.getFullYear(), 0, 1);
+        const timeDiff = date - startOfYear;
+        return Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    }
+
     const wait = async (ms) => {
         return new Promise(resolve => {
             window.setTimeout(resolve, ms);
@@ -104,15 +110,21 @@
         background.id = "info-container";
 
         // Create status text div
-        const infoText = document.createElement("div");
+        const infoText = document.createElement("pre");
         infoText.id = "referee-info";
         infoText.innerText = "Loading...";
+        infoText.style.color = "white";
+        infoText.style.fontSize = "18px";
         background.appendChild(infoText);
         document.body.appendChild(background);
 
         // Add color for visited link
-        let sheet = window.document.styleSheets[0];
-        sheet.insertRule('a:visited { color: #5d523f !important; }', sheet.cssRules.length);
+        try {
+            let sheet = window.document.styleSheets[0];
+            sheet.insertRule('a:visited { color: #5d523f !important; }', sheet.cssRules.length);
+        } catch(e){
+            console.log(e);
+        }
     };
 
     const addLink = (url) => {
